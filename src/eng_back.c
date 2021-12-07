@@ -636,11 +636,22 @@ static void *match_cert(ENGINE_CTX *ctx, PKCS11_TOKEN *tok,
 			dump_hex(ctx, 1, k->id, k->id_len);
 			ctx_log(ctx, 1, " label=%s\n", k->label ? k->label : "(null)");
 
-			if (obj_label && k->label && strcmp(k->label, obj_label) == 0)
-				selected_cert = k;
-			if (obj_id_len != 0 && k->id_len == obj_id_len &&
-					memcmp(k->id, obj_id, obj_id_len) == 0)
-				selected_cert = k;
+			if (obj_label && obj_id_len != 0) {
+				if (k->label && strcmp(k->label, obj_label) == 0 &&
+						k->id_len == obj_id_len &&
+						memcmp(k->id, obj_id, obj_id_len) == 0) {
+					selected_cert = k;
+				}
+			} else if (obj_label && !obj_id_len) {
+				if (k->label && strcmp(k->label, obj_label) == 0) {
+					selected_cert = k;
+				}
+			} else if (obj_id_len && !obj_label) {
+				if (k->id_len == obj_id_len &&
+						memcmp(k->id, obj_id, obj_id_len) == 0) {
+					selected_cert = k;
+				}
+			}
 		}
 	} else {
 		which = "first (with id present)";
@@ -729,11 +740,22 @@ static void *match_key(ENGINE_CTX *ctx, const char *key_type,
 			dump_hex(ctx, 1, k->id, k->id_len);
 			ctx_log(ctx, 1, " label=%s\n", k->label ? k->label : "(null)");
 
-			if (obj_label && k->label && strcmp(k->label, obj_label) == 0)
-				selected_key = k;
-			if (obj_id_len != 0 && k->id_len == obj_id_len
-					&& memcmp(k->id, obj_id, obj_id_len) == 0)
-				selected_key = k;
+			if (obj_label && obj_id_len != 0) {
+				if (k->label && strcmp(k->label, obj_label) == 0 &&
+						k->id_len == obj_id_len &&
+						memcmp(k->id, obj_id, obj_id_len) == 0) {
+					selected_key = k;
+				}
+			} else if (obj_label && !obj_id_len) {
+				if (k->label && strcmp(k->label, obj_label) == 0) {
+					selected_key = k;
+				}
+			} else if (obj_id_len && !obj_label) {
+				if (k->id_len == obj_id_len &&
+						memcmp(k->id, obj_id, obj_id_len) == 0) {
+					selected_key = k;
+				}
+			}
 		}
 	} else {
 		which = "first";
